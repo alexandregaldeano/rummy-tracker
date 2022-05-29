@@ -1,33 +1,20 @@
 <!--suppress HtmlUnknownBooleanAttribute -->
 <template>
-  <v-card :color="card.remaining ? 'grey-lighten-5' : 'grey-lighten-2'" elevation="0" class="pb-0">
-    <v-card-title class="d-flex justify-center">
-      <v-row>
-        <v-col :class="['d-flex', 'justify-center', color]" cols="12" sm="6">
-          <v-img v-if="card.value === 'joker'" src="img/joker.svg"/>
-          <span v-else-if="['ace', 'jack', 'queen', 'king'].includes(card.value)">
+  <v-card :color="card.remaining ? 'grey-lighten-5' : 'red-lighten-5'" class="pb-0" elevation="0"
+          @click="card.incrementPlayed(true)">
+    <v-card-title :class="['d-flex', 'justify-center', iconColor]">
+      <v-img v-if="card.value === 'joker'" height="38" src="img/joker.svg"/>
+      <span v-else-if="['ace', 'jack', 'queen', 'king'].includes(card.value)">
             {{ card.value[0].toUpperCase() }}
             <v-icon>mdi-cards-{{ card.type }}</v-icon>
           </span>
-          <span v-else>{{ card.value }}<v-icon>mdi-cards-{{ card.type }}</v-icon></span>
-        </v-col>
-        <v-col class="d-flex justify-center" cols="12" sm="6">{{ card.remaining }} / {{ card.total }}</v-col>
-      </v-row>
+      <span v-else>{{ card.value }}<v-icon>mdi-cards-{{ card.type }}</v-icon></span>
     </v-card-title>
-    <v-card-actions class="pt-0 pb-0">
-      <v-row>
-        <v-col class="d-flex justify-center pa-0 pl-1" cols="6">
-          <v-btn :disabled="card.played === 0" block @click="card.decrementPlayed()">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
-        </v-col>
-        <v-col class="d-flex justify-center pa-0 pr-1" cols="6">
-          <v-btn :disabled="card.remaining === 0" block @click="card.incrementPlayed()">
-            <v-icon>mdi-minus</v-icon>
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-card-actions>
+    <v-card-text class="pa-0">
+      <v-progress-linear :color="barColor" :model-value="card.remainingPercent" height="15">
+        <small><strong>{{ card.remaining }} / {{ card.total }}</strong></small>
+      </v-progress-linear>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -48,29 +35,55 @@ const props = defineProps({
   card: CardStatus,
 })
 
-const color = computed(() => [undefined, CardType.CLUB, CardType.SPADE].includes(props.card?.type) ? 'black' : 'red')
+const iconColor = computed(() => [undefined, CardType.CLUB, CardType.SPADE].includes(props.card?.type) ? 'black' : 'red')
+
+const max: [number, number, number] = [200, 230, 201]
+const min: [number, number, number] = [255, 205, 210]
+
+function linearInterpolation(from: number, to: number, ratio: number, round = true): number {
+  const interpolation = from + (to - from) * ratio
+  return round ? Math.round(interpolation) : interpolation
+}
+
+function quadraticInterpolation(from: number, to: number, ratio: number, round = true): number {
+  const interpolation = Math.sqrt(linearInterpolation(from * from, to * to, ratio, false))
+  return round ? Math.round(interpolation) : interpolation
+}
+
+const barColor = computed(() => {
+  const { card } = props
+  if (!card) return ''
+  const ratio = card.remainingPercent / 100
+  const rgb = min.map((from, index) => {
+    const to = max[index]
+    return quadraticInterpolation(from, to, ratio)
+  }) as [number, number, number]
+  console.error(rgb)
+  return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`
+})
+
 </script>
 
 <style lang="scss" scoped>
 .v-card {
   user-select: none;
+  cursor: pointer;
 }
 
 .red i {
-  color: red;
+  color: #F44336;
 }
 
 .black i {
-  color: black;
+  color: #212121;
 }
 
 .v-img {
-  max-height: 38px;
   margin-top: -2px;
   margin-bottom: -4px;
 }
 
-:deep(button)  {
- height: 52px !important;
+:deep(button) {
+  height: 52px !important;
 }
 </style>

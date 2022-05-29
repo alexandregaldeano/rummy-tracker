@@ -40,12 +40,12 @@ export class CardStatus extends Card {
     return this._played
   }
 
-  incrementPlayed(): void {
-    if (this._played === this.total) {
+  incrementPlayed(allowOverflow = false): void {
+    if (this._played === this.total && !allowOverflow) {
       console.warn('Unable to increment played, ignoring')
       return
     }
-    this._played++
+    this._played = (this._played + 1) % (this.total + 1)
   }
 
   decrementPlayed(): void {
@@ -58,6 +58,10 @@ export class CardStatus extends Card {
 
   get remaining(): number {
     return this.total - this.played
+  }
+
+  get remainingPercent(): number {
+    return 100 * this.remaining / this.total
   }
 
   resetPlayed(): void {
