@@ -3,19 +3,27 @@ export enum CardType {
   HEART = 'heart',
   CLUB = 'club',
   DIAMOND = 'diamond',
+  JOKER = 'joker',
 }
 
-export type CardValue = 'joker' | 'ace' | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 'jack' | 'queen' | 'king'
+export type CardValue = 'ace' | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 'jack' | 'queen' | 'king'
 
 export default class Card {
-  readonly value: CardValue
+  private _value: CardValue
 
-  readonly type?: CardType
+  readonly type: CardType
 
-  constructor(value: CardValue, type?: CardType) {
-    this.value = value
-    if (value !== 'joker' && !type) throw Error(`Card ${value} needs to have a type`)
-    if (value === 'joker' && type) console.warn('Joker type is ignored')
+  constructor(type: CardType, value?: CardValue) {
     this.type = type
+    this._value = value ?? 'ace'
+  }
+
+  get value(): CardValue {
+    return this._value
+  }
+
+  set value(value: CardValue) {
+    if (this.type !== CardType.JOKER) throw Error('None Joker card cannot change their value.')
+    this._value = value
   }
 }

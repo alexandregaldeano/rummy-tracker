@@ -23,48 +23,65 @@ export default class Deck {
 export class CardStatus extends Card {
   readonly total: number
 
-  private _played: number
+  private _played = 0
 
-  constructor(card: Card, total: number, played?: number) {
-    super(card.value, card.type)
+  private _drawn = 0
+
+  private _discarded = 0
+
+  constructor(card: Card, total: number) {
+    super(card.type, card.value)
     if (total < 0) throw Error(`Total has to be positive, is: ${total}`)
     this.total = total
-    if (played !== undefined) {
-      if (played < 0) throw Error(`Played has to be positive, is: ${played}`)
-      if (played > total) throw Error(`Played has to be less than the total (${total}), is: ${played}`)
-    }
-    this._played = played ?? 0
   }
 
   get played(): number {
     return this._played
   }
 
-  incrementPlayed(allowOverflow = false): void {
-    if (this._played === this.total && !allowOverflow) {
-      console.warn('Unable to increment played, ignoring')
-      return
-    }
-    this._played = (this._played + 1) % (this.total + 1)
+  get drawn(): number {
+    return this._drawn
   }
 
-  decrementPlayed(): void {
-    if (this._played <= 0) {
-      console.warn('Unable to decrement played, ignoring')
-      return
-    }
-    this._played--
+  get discarded(): number {
+    return this._discarded
+  }
+
+  reset(): void {
+    this._played = 0
+    this._drawn = 0
+    this._discarded = 0
   }
 
   get remaining(): number {
-    return this.total - this.played
+    return this.total - this.played - this.discarded - this.drawn
   }
 
   get remainingPercent(): number {
     return 100 * this.remaining / this.total
   }
 
-  resetPlayed(): void {
-    this._played = 0
+  incrementPlayed(): void {
+    this._played = this.remaining <= 0 ? 0 : this._played + 1
+  }
+
+  incrementDrawn(): void {
+    this._drawn = this.remaining <= 0 ? 0 : this._drawn + 1
+  }
+
+  incrementDiscarded(): void {
+    this._discarded = this.remaining <= 0 ? 0 : this._discarded + 1
+  }
+
+  moveDrawnToPlayed(): void {
+    if (this._drawn <= 0) return
+    this._drawn--
+    this._played++
+  }
+
+  moveDrawnToDiscarded(): void {
+    if (this._drawn <= 0) return
+    this._drawn--
+    this._discarded++
   }
 }
