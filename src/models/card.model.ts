@@ -26,4 +26,8 @@ export default class Card {
     if (this.type !== CardType.JOKER) throw Error('None Joker card cannot change their value.')
     this._value = value
   }
+
+  copy(type = this.type, value: CardValue | undefined = this._value): Card {
+    return new Card(type, value)
+  }
 }

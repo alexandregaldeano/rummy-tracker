@@ -25,11 +25,23 @@
         <CardStatusComponent :card="card"/>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="hand.length">
       <v-col cols="12">
         <h2 class="title">Hand</h2>
+        <h3 v-if="combination" class="title">{{ combination.points }}</h3>
       </v-col>
       <v-col v-for="(card, cardIndex) of hand" :key="cardIndex"  class="pa-1" cols="3" sm="2" md="1">
+        <CardComponent :card="card"/>
+      </v-col>
+    </v-row>
+    <v-row v-if="combination">
+      <v-col cols="12">
+        <h2 class="title">
+          Combination: {{ combination.points }}
+          <span v-if="combination.isPureSequence">(pure sequence)</span>
+        </h2>
+      </v-col>
+      <v-col v-for="(card, cardIndex) of combination.cards" :key="cardIndex" class="pa-1" cols="3" sm="2" md="1">
         <CardComponent :card="card"/>
       </v-col>
     </v-row>
@@ -43,6 +55,7 @@ import Card, { CardType, CardValue } from '@/models/card.model'
 import { $enum } from 'ts-enum-util'
 import CardStatusComponent from '@/components/CardStatusComponent.vue'
 import CardComponent from '@/components/CardComponent.vue'
+import Combination from '@/models/combination.model'
 
 @Options({
   components: { CardStatusComponent, CardComponent },
@@ -67,6 +80,8 @@ export default class HomeView extends Vue {
       ],
   )
 
+  combination: Combination | null = null
+
   get allCardValues(): CardValue[] {
     return ['ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'jack', 'queen', 'king'] as CardValue[]
   }
@@ -90,13 +105,15 @@ export default class HomeView extends Vue {
   }
 
   get hand(): Card[] {
-    return this.deck.cards.map((it) => {
+    const hand = this.deck.cards.map((it) => {
       const cards: Card[] = []
       for (let index = 0; index < it.drawn; index++) {
         cards.push(new Card(it.type, it.value))
-      }
+      }1
       return cards
     }).flat()
+    this.combination = new Combination(hand)
+    return hand
   }
 
   filterValue(value: CardValue): void {

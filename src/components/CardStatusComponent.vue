@@ -109,7 +109,6 @@ const barColor = computed(() => {
     const to = max[index]
     return quadraticInterpolation(from, to, ratio)
   }) as [number, number, number]
-  console.error(rgb)
   return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`
 })
 </script>
