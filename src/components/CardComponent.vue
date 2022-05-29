@@ -1,19 +1,25 @@
 <!--suppress HtmlUnknownBooleanAttribute -->
 <template>
-  <v-card :color="card.remaining ? 'grey-lighten-5' : 'red-lighten-5'" class="pb-0" elevation="0"
+  <v-card :color="card.remaining ? 'grey-lighten-4' : 'red-lighten-5'" class="pa-0" elevation="0"
           @click="card.incrementPlayed(true)">
-    <v-card-title :class="['d-flex', 'justify-center', iconColor]">
-      <v-img v-if="card.value === 'joker'" height="38" src="img/joker.svg"/>
-      <span v-else-if="['ace', 'jack', 'queen', 'king'].includes(card.value)">
+    <v-card-text class="pa-0">
+      <v-row class="ma-0">
+        <v-col cols="12" :class="['d-flex', 'justify-center', 'pa-2', iconColor]">
+          <div class="jokerContainer" v-if="card.value === 'joker'">
+            <v-img src="img/joker.svg"/>
+          </div>
+          <span v-else-if="['ace', 'jack', 'queen', 'king'].includes(card.value)">
             {{ card.value[0].toUpperCase() }}
             <v-icon>mdi-cards-{{ card.type }}</v-icon>
           </span>
-      <span v-else>{{ card.value }}<v-icon>mdi-cards-{{ card.type }}</v-icon></span>
-    </v-card-title>
-    <v-card-text class="pa-0">
-      <v-progress-linear :color="barColor" :model-value="card.remainingPercent" height="15">
-        <small><strong>{{ card.remaining }} / {{ card.total }}</strong></small>
-      </v-progress-linear>
+          <span v-else>{{ card.value }}<v-icon>mdi-cards-{{ card.type }}</v-icon></span>
+        </v-col>
+        <v-col cols="12" class="pa-0">
+          <v-progress-linear :color="barColor" :model-value="card.remainingPercent" height="16">
+            <small><strong>{{ card.remaining }} / {{ card.total }}</strong></small>
+          </v-progress-linear>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
@@ -78,9 +84,14 @@ const barColor = computed(() => {
   color: #212121;
 }
 
-.v-img {
-  margin-top: -2px;
-  margin-bottom: -4px;
+.jokerContainer {
+  height: 21px;
+  width: 100%;
+  .v-img {
+    height: 31px;
+    max-height: unset;
+    margin-top: -5px;
+  }
 }
 
 :deep(button) {

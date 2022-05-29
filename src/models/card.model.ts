@@ -1,8 +1,8 @@
 export enum CardType {
   SPADE = 'spade',
   HEART = 'heart',
+  CLUB = 'club',
   DIAMOND = 'diamond',
-  CLUB = 'club'
 }
 
 export type CardValue = 'joker' | 'ace' | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 'jack' | 'queen' | 'king'

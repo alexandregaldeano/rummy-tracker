@@ -23,7 +23,7 @@
           <v-icon>mdi-cards-{{ type }}</v-icon>
         </v-btn>
       </v-col>
-      <v-col v-for="(card, cardIndex) of filteredCards" :key="cardIndex" cols="6" md="2" sm="3" xl="1">
+      <v-col v-for="(card, cardIndex) of filteredCards" :key="cardIndex" cols="6" md="2" sm="3" xl="1" class="pa-1">
         <CardComponent :card="card"/>
       </v-col>
     </v-row>
